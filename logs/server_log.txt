@@ -24,3 +24,7 @@
 2024-11-10 20:01:07,361 - Client client2 updated counter to 0
 2024-11-10 20:01:18,604 - Client client2 updated counter to 10
 2024-11-10 20:01:21,605 - Client client2 updated counter to 6
+2024-11-10 20:07:16,331 - Client client2 updated counter to 0
+2024-11-10 20:07:19,332 - Client client2 updated counter to 0
+2024-11-10 20:07:25,609 - Client client2 updated counter to 0
+2024-11-10 20:07:28,610 - Client client2 updated counter to 0

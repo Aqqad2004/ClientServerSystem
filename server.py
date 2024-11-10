@@ -23,8 +23,11 @@ def handle_client(conn, addr):
         
         # Register client
 
-        if "id" not in client_data or "password" not in client_data:
-            raise ValueError("Invalid client data format.")
+        if not register_client(client_data, conn):
+
+            conn.send(b"Error: Registration failed.")
+
+            return
 
         conn.send(b"Registration successful.")
         
@@ -46,9 +49,7 @@ def handle_client(conn, addr):
             log_activity(client_data['id'], new_value)
 
             conn.send(f"Counter updated: {new_value}".encode())
-    except (json.JSONDecodeError, ValueError):
-        conn.send(b"Error: Invalid data format.")
-        return
+
     finally:
 
         # Cleanup and close connection
