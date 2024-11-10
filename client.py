@@ -36,7 +36,7 @@ def execute_actions(client_socket, actions):
 
 if __name__ == "__main__":
 
-    config = load_config("config.json")
+    config = load_config("config2.json")
     
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

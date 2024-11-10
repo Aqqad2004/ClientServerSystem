@@ -23,11 +23,8 @@ def handle_client(conn, addr):
         
         # Register client
 
-        if not register_client(client_data, conn):
-
-            conn.send(b"Error: Registration failed.")
-
-            return
+        if "id" not in client_data or "password" not in client_data:
+            raise ValueError("Invalid client data format.")
 
         conn.send(b"Registration successful.")
         
@@ -49,7 +46,9 @@ def handle_client(conn, addr):
             log_activity(client_data['id'], new_value)
 
             conn.send(f"Counter updated: {new_value}".encode())
-
+    except (json.JSONDecodeError, ValueError):
+        conn.send(b"Error: Invalid data format.")
+        return
     finally:
 
         # Cleanup and close connection
@@ -60,31 +59,38 @@ def handle_client(conn, addr):
 
             del clients[client_data['id']]
 
+from threading import Lock
+
+clients_lock = Lock()
+
 def register_client(client_data, conn):
-
     client_id = client_data['id']
-
     password = client_data['password']
 
-    if client_id in clients and clients[client_id]['password'] != password:
+    with clients_lock:
+        if client_id in clients and clients[client_id]['password'] != password:
+            return False
 
-        return False
-    
-    clients[client_id] = {"password": password, "counter": 0, "connection": conn}
+        clients[client_id] = {"password": password, "counter": 0, "connection": conn}
 
     return True
 
 def process_action(client_id, action, amount):
+    if client_id not in clients:
+        return 0
 
-    if client_id in clients:
+    if action not in ["INCREASE", "DECREASE"]:
+        return clients[client_id]["counter"]
 
-        if action == "INCREASE":
+    try:
+        amount = int(amount)
+    except ValueError:
+        return clients[client_id]["counter"]
 
-            clients[client_id]["counter"] += amount
-
-        elif action == "DECREASE":
-
-            clients[client_id]["counter"] -= amount
+    if action == "INCREASE":
+        clients[client_id]["counter"] += amount
+    elif action == "DECREASE":
+        clients[client_id]["counter"] -= amount
 
     return clients[client_id]["counter"]
 
